@@ -1,0 +1,59 @@
+/* Customer area */
+.cust-center { text-align: center; align-items: center; }
+.cust-ok { color: var(--green); font-weight: 700; }
+.cust-sec { align-items: baseline; }
+.cust-kicker { font-size: .8rem; font-weight: 700; color: var(--red); }
+.cust-hero-cta { margin-top: 14px; }
+.hero .hero-search .btn { padding: 0 14px; }
+.cust-upnext { display: block; text-decoration: none; color: inherit; border-left: 6px solid var(--red); }
+.cust-upnext > * + * { margin-top: 6px; }
+.cust-up-title { font-size: 1.05rem; }
+.cust-bcard .top { display: flex; gap: 12px; }
+.cust-bcard .cust-meta { display: flex; align-items: center; gap: 4px; margin-top: 3px; }
+.cust-name-link { color: var(--ink); text-decoration: none; font-family: var(--font-display); font-size: 1.15rem; }
+.cust-name-link::after { content: ''; position: absolute; inset: 0; }
+.cust-bcard { position: relative; }
+.cust-bcard .cust-book { position: relative; z-index: 2; }
+.cust-bcard .tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
+.cust-bcard .price { font-weight: 800; color: var(--navy); font-size: 1.15rem; }
+.cust-filter-btn { position: relative; }
+.cust-count { background: var(--red); color: #fff; border-radius: 99px; min-width: 20px; height: 20px; font-size: .75rem; display: inline-grid; place-items: center; padding: 0 5px; }
+.cust-active-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.cust-fchip { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 4px 12px; }
+.cust-sort select { min-height: 40px; padding: 4px 10px; width: auto; }
+.seg button { display: inline-flex; align-items: center; gap: 6px; }
+.cust-mapwrap { position: relative; }
+.cust-locate { position: absolute; right: 10px; bottom: 10px; z-index: 500; box-shadow: var(--shadow); }
+.cust-mini { margin-top: 10px; }
+.cust-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
+.cust-stat { background: var(--paper); border-radius: 12px; padding: 10px; text-align: center; }
+.cust-stat .money { font-size: 1.1rem; }
+.cust-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.cust-shot { border: 0; padding: 0; background: none; aspect-ratio: 1; border-radius: 12px; overflow: hidden; }
+.cust-shot img { width: 100%; height: 100%; object-fit: cover; }
+.cust-bigshot { width: 100%; border-radius: 12px; }
+.cust-areamap { height: 200px; }
+.cust-pickmap { height: 240px; }
+.cust-check { display: flex; gap: 10px; align-items: center; min-height: 44px; }
+.cust-check input { width: 22px; height: 22px; }
+.cust-progress { margin-bottom: 4px; }
+.cust-wnav { position: sticky; bottom: calc(var(--safe-bottom) + 8px); background: linear-gradient(transparent, var(--paper) 35%); padding-top: 14px; z-index: 5; }
+.cust-bk-top { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; margin-bottom: 10px; }
+.cust-seg { width: 100%; }
+.cust-seg button { flex: 1; padding: 8px 4px; font-size: .88rem; }
+.cust-hold { background: var(--amber-bg); }
+.cust-checkout { border: 2px solid var(--navy); }
+.cust-paybtn { min-height: 54px; font-size: 1.05rem; }
+.empty-ill { width: 76px; height: 76px; border-radius: 50%; background: var(--blue-bg); display: grid; place-items: center; color: var(--navy); margin: 0 auto; }
+.cust-starpick { display: flex; gap: 6px; }
+.cust-starpick button { border: 0; background: none; font-size: 2.2rem; color: var(--line); width: 48px; height: 48px; line-height: 1; }
+.cust-starpick button.on { color: #d99a00; }
+/* shared account pieces */
+.acct-sec > summary { display: flex; align-items: center; gap: 12px; list-style: none; cursor: pointer; min-height: 44px; }
+.acct-sec > summary::-webkit-details-marker { display: none; }
+.acct-sec[open] > summary svg:last-child { transform: rotate(180deg); }
+.acct-body { padding-top: 14px; }
+.acct-notif { text-align: left; }
+.acct-notif .acct-dot { width: 10px; height: 10px; border-radius: 50%; background: transparent; flex: none; }
+.acct-notif.unread .acct-dot { background: var(--red); }
+.acct-notif.unread { background: #f1f5fd; margin: 0 -16px; padding-left: 16px; padding-right: 16px; }

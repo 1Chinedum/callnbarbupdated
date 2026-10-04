@@ -1,0 +1,37 @@
+/* Barber app screens */
+.barb-h1 { font-size: 1.7rem; }
+.barb-h2 { font-size: 1.15rem; }
+.barb-green { color: var(--green); }
+.barb-ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.barb-spin svg { animation: barbspin .8s linear infinite; }
+@keyframes barbspin { to { transform: rotate(360deg); } }
+.barb-live { min-height: 40vh; }
+.barb-verify { align-items: flex-start; }
+.barb-stats { gap: 10px; }
+.barb-stat { display: flex; flex-direction: column; gap: 2px; text-decoration: none; color: inherit; }
+.barb-stat-ico { width: 32px; height: 32px; border-radius: 10px; background: var(--blue-bg); color: var(--navy); display: grid; place-items: center; margin-bottom: 4px; }
+.barb-stat-val { font-size: 1.5rem; }
+.barb-stat.green .barb-stat-ico { background: var(--green-bg); color: var(--green); }
+.barb-stat.amber .barb-stat-ico { background: var(--amber-bg); color: var(--amber); }
+.barb-seg { width: 100%; }
+.barb-appt { display: flex; flex-direction: column; gap: 12px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); }
+.barb-appt-top { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; min-width: 0; }
+.barb-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font-size: .9rem; }
+.barb-meta > * { display: inline-flex; align-items: center; gap: 6px; }
+.barb-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.barb-actions .btn { flex: 1 1 auto; }
+.barb-earn { background: linear-gradient(180deg, #fff, var(--green-bg)); }
+.barb-earn-row { font-size: 1.05rem; }
+.barb-paid { align-items: center; }
+.barb-paid-amt { font-size: 1.1rem; }
+.barb-bigbtn { min-height: 60px; font-size: 1.1rem; }
+.barb-scan-cta { gap: 10px; }
+.barb-scan #barb-reader { width: 100%; }
+.barb-scan #barb-reader video { width: 100%; object-fit: cover; }
+.barb-check { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.barb-check li { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+.barb-check li.ok { color: var(--green); font-weight: 600; }
+.barb-portfolio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.barb-portfolio img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }
+.money-tone { color: var(--green); }
+.alert { color: var(--red); }

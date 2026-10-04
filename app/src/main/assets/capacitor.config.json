@@ -1,0 +1,22 @@
+{
+	"appId": "com.callnbarb.app",
+	"appName": "CallNBarb",
+	"webDir": "www",
+	"android": {
+		"allowMixedContent": true
+	},
+	"server": {
+		"androidScheme": "http",
+		"cleartext": true
+	},
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 800,
+			"backgroundColor": "#12285a"
+		},
+		"StatusBar": {
+			"style": "DARK",
+			"backgroundColor": "#ffffff"
+		}
+	}
+}
