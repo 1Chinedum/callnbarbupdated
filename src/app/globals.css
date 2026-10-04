@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gold: #d4a84b;
+}
+
+html,
+body {
+  background: #0c0a08;
+  color: #f7f1e6;
+}
+
+*:focus-visible {
+  outline: 2px solid #d4a84b;
+  outline-offset: 2px;
+}
+
+.gold-line {
+  background: linear-gradient(90deg, transparent, #d4a84b, transparent);
+  height: 1px;
+}
+
+.card {
+  @apply rounded-2xl border border-white/10 bg-ink-900/80 shadow-card;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition disabled:opacity-50;
+}
+
+.btn-primary {
+  @apply btn bg-gold-500 text-ink-950 hover:bg-gold-400;
+}
+
+.btn-ghost {
+  @apply btn border border-white/15 bg-white/5 hover:bg-white/10;
+}
+
+.input {
+  @apply w-full rounded-xl border border-white/10 bg-ink-950 px-3 py-2.5 text-sm text-cream placeholder:text-ink-200/50;
+}
+
+.nav-safe {
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+}
+
+.skeleton {
+  @apply animate-pulse rounded-xl bg-white/10;
+}
