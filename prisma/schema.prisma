@@ -1,0 +1,530 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  BARBER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
+enum BookingStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  BARBER_PENDING
+  ACCEPTED
+  ON_THE_WAY
+  ARRIVED
+  VERIFIED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DISPUTED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESSFUL
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum QrTokenStatus {
+  ACTIVE
+  USED
+  INVALIDATED
+}
+
+enum WalletTxnType {
+  SERVICE_EARNING
+  PLATFORM_FEE
+  WITHDRAWAL
+  REFUND
+  ADJUSTMENT
+  REVERSAL
+}
+
+enum TxnStatus {
+  PENDING
+  SUCCESSFUL
+  FAILED
+  CANCELLED
+}
+
+enum WithdrawalStatus {
+  PENDING
+  PROCESSING
+  SUCCESSFUL
+  FAILED
+  REJECTED
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING
+  RESOLVED
+  CLOSED
+}
+
+enum DisputeStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED
+  REJECTED
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+  SMS
+  PUSH
+}
+
+model User {
+  id               String     @id @default(cuid())
+  role             Role
+  name             String
+  email            String     @unique
+  phone            String     @unique
+  passwordHash     String
+  profileImage     String?
+  status           UserStatus @default(ACTIVE)
+  emailVerifiedAt  DateTime?
+  phoneVerifiedAt  DateTime?
+  referralCode     String?    @unique
+  referredByCode   String?
+  lastLoginAt      DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  barberProfile    BarberProfile?
+  addresses        Address[]
+  customerBookings Booking[]  @relation("CustomerBookings")
+  payments         Payment[]
+  reviews          Review[]
+  notifications    Notification[]
+  supportTickets   SupportTicket[]
+  disputesOpened   Dispute[]  @relation("DisputeOpener")
+  passwordResets   PasswordReset[]
+  auditLogs        AuditLog[]
+  notificationPrefs NotificationPreference?
+
+  @@index([role, status])
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model BarberProfile {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  bio                  String?
+  experienceYears      Int                @default(0)
+  verificationStatus   VerificationStatus @default(PENDING)
+  verificationNote     String?
+  serviceArea          String?
+  addressLine          String?
+  city                 String?
+  state                String?
+  country              String             @default("NG")
+  latitude             Float?
+  longitude            Float?
+  ratingAvg            Float              @default(0)
+  totalReviews         Int                @default(0)
+  completedJobs        Int                @default(0)
+  slotMinutes          Int                @default(30)
+  maxDailyAppointments Int                @default(12)
+  homeService          Boolean            @default(true)
+  bankName             String?
+  accountNumber        String?
+  accountName          String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  services             BarberService[]
+  availability         Availability[]
+  blockedDates         BlockedDate[]
+  documents            VerificationDocument[]
+  portfolio            PortfolioItem[]
+  bookings             Booking[]
+  wallet               Wallet?
+  withdrawals          Withdrawal[]
+  reviews              Review[]
+}
+
+model VerificationDocument {
+  id              String        @id @default(cuid())
+  barberId        String
+  documentType    String
+  filePath        String
+  originalName    String
+  mimeType        String
+  createdAt       DateTime      @default(now())
+  barber          BarberProfile @relation(fields: [barberId], references: [id], onDelete: Cascade)
+}
+
+model PortfolioItem {
+  id        String        @id @default(cuid())
+  barberId  String
+  imagePath String
+  caption   String?
+  createdAt DateTime      @default(now())
+  barber    BarberProfile @relation(fields: [barberId], references: [id], onDelete: Cascade)
+}
+
+model ServiceCategory {
+  id          String          @id @default(cuid())
+  name        String          @unique
+  slug        String          @unique
+  description String?
+  active      Boolean         @default(true)
+  sortOrder   Int             @default(0)
+  createdAt   DateTime        @default(now())
+  services    BarberService[]
+}
+
+model BarberService {
+  id          String          @id @default(cuid())
+  barberId    String
+  categoryId  String
+  name        String
+  description String?
+  priceKobo   Int
+  durationMin Int
+  active      Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  barber      BarberProfile   @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  category    ServiceCategory @relation(fields: [categoryId], references: [id])
+  bookings    Booking[]
+
+  @@index([barberId, active])
+}
+
+model Address {
+  id           String    @id @default(cuid())
+  userId       String
+  label        String?
+  address      String
+  city         String
+  state        String
+  country      String    @default("NG")
+  landmark     String?
+  instructions String?
+  latitude     Float?
+  longitude    Float?
+  isDefault    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookings     Booking[]
+
+  @@index([userId])
+}
+
+model Availability {
+  id          String        @id @default(cuid())
+  barberId    String
+  dayOfWeek   Int
+  startTime   String
+  endTime     String
+  breakStart  String?
+  breakEnd    String?
+  active      Boolean       @default(true)
+  barber      BarberProfile @relation(fields: [barberId], references: [id], onDelete: Cascade)
+
+  @@unique([barberId, dayOfWeek])
+}
+
+model BlockedDate {
+  id        String        @id @default(cuid())
+  barberId  String
+  date      String
+  reason    String?
+  barber    BarberProfile @relation(fields: [barberId], references: [id], onDelete: Cascade)
+
+  @@unique([barberId, date])
+}
+
+model Booking {
+  id                String         @id @default(cuid())
+  publicRef         String         @unique
+  customerId        String
+  barberId          String
+  serviceId         String
+  addressId         String
+  bookingDate       String
+  startTime         String
+  endTime           String
+  amountKobo        Int
+  platformFeeKobo   Int
+  barberEarningKobo Int
+  currency          String         @default("NGN")
+  status            BookingStatus  @default(PENDING_PAYMENT)
+  cancelReason      String?
+  cancelledById     String?
+  cancelledAt       DateTime?
+  verifiedAt        DateTime?
+  startedAt         DateTime?
+  completedAt       DateTime?
+  reminder24SentAt  DateTime?
+  reminder1SentAt   DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  customer          User           @relation("CustomerBookings", fields: [customerId], references: [id])
+  barber            BarberProfile  @relation(fields: [barberId], references: [id])
+  service           BarberService  @relation(fields: [serviceId], references: [id])
+  address           Address        @relation(fields: [addressId], references: [id])
+  payments          Payment[]
+  qrTokens          QrToken[]
+  qrScans           QrScan[]
+  walletTxns        WalletTransaction[]
+  review            Review?
+  tickets           SupportTicket[]
+  disputes          Dispute[]
+
+  @@index([barberId, bookingDate, status])
+  @@index([customerId, status])
+  @@index([status])
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  bookingId       String
+  customerId      String
+  amountKobo      Int
+  currency        String        @default("NGN")
+  provider        String        @default("paystack")
+  reference       String        @unique
+  accessCode      String?
+  status          PaymentStatus @default(PENDING)
+  verified        Boolean       @default(false)
+  verifiedAt      DateTime?
+  providerPayload String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  booking         Booking       @relation(fields: [bookingId], references: [id])
+  customer        User          @relation(fields: [customerId], references: [id])
+  refunds         Refund[]
+
+  @@index([status])
+}
+
+model Refund {
+  id            String        @id @default(cuid())
+  paymentId     String
+  amountKobo    Int
+  reason        String
+  reference     String        @unique
+  status        PaymentStatus @default(PENDING)
+  providerRef   String?
+  createdAt     DateTime      @default(now())
+  processedAt   DateTime?
+  payment       Payment       @relation(fields: [paymentId], references: [id])
+}
+
+model QrToken {
+  id        String         @id @default(cuid())
+  bookingId String
+  tokenHash String         @unique
+  expiresAt DateTime?
+  usedAt    DateTime?
+  status    QrTokenStatus  @default(ACTIVE)
+  createdAt DateTime       @default(now())
+  booking   Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  scans     QrScan[]
+}
+
+model QrScan {
+  id           String   @id @default(cuid())
+  bookingId    String
+  qrTokenId    String?
+  barberUserId String
+  success      Boolean
+  reason       String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+  booking      Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  qrToken      QrToken? @relation(fields: [qrTokenId], references: [id])
+}
+
+model Wallet {
+  id               String        @id @default(cuid())
+  barberId         String        @unique
+  availableKobo    Int           @default(0)
+  pendingKobo      Int           @default(0)
+  totalEarnedKobo  Int           @default(0)
+  totalWithdrawnKobo Int         @default(0)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  barber           BarberProfile @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  transactions     WalletTransaction[]
+}
+
+model WalletTransaction {
+  id            String        @id @default(cuid())
+  walletId      String
+  bookingId     String?
+  withdrawalId  String?
+  type          WalletTxnType
+  amountKobo    Int
+  balanceBefore Int
+  balanceAfter  Int
+  description   String
+  status        TxnStatus     @default(SUCCESSFUL)
+  createdAt     DateTime      @default(now())
+  wallet        Wallet        @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  booking       Booking?      @relation(fields: [bookingId], references: [id])
+  withdrawal    Withdrawal?   @relation(fields: [withdrawalId], references: [id])
+
+  @@index([walletId, createdAt])
+}
+
+model Withdrawal {
+  id            String            @id @default(cuid())
+  barberId      String
+  amountKobo    Int
+  bankName      String
+  accountNumber String
+  accountName   String
+  status        WithdrawalStatus  @default(PENDING)
+  reference     String            @unique
+  providerRef   String?
+  rejectReason  String?
+  createdAt     DateTime          @default(now())
+  processedAt   DateTime?
+  barber        BarberProfile     @relation(fields: [barberId], references: [id])
+  ledger        WalletTransaction[]
+}
+
+model Review {
+  id         String        @id @default(cuid())
+  bookingId  String        @unique
+  customerId String
+  barberId   String
+  rating     Int
+  comment    String?
+  createdAt  DateTime      @default(now())
+  booking    Booking       @relation(fields: [bookingId], references: [id])
+  customer   User          @relation(fields: [customerId], references: [id])
+  barber     BarberProfile @relation(fields: [barberId], references: [id])
+
+  @@index([barberId])
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String
+  channel   NotificationChannel @default(IN_APP)
+  dataJson  String?
+  readAt    DateTime?
+  createdAt DateTime            @default(now())
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
+
+model NotificationPreference {
+  id           String  @id @default(cuid())
+  userId       String  @unique
+  inApp        Boolean @default(true)
+  email        Boolean @default(true)
+  sms          Boolean @default(false)
+  push         Boolean @default(true)
+  reminders    Boolean @default(true)
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SupportTicket {
+  id          String       @id @default(cuid())
+  userId      String
+  bookingId   String?
+  category    String
+  subject     String
+  description String
+  status      TicketStatus @default(OPEN)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  booking     Booking?     @relation(fields: [bookingId], references: [id])
+  messages    TicketMessage[]
+}
+
+model TicketMessage {
+  id        String         @id @default(cuid())
+  ticketId  String
+  authorId  String
+  body      String
+  createdAt DateTime       @default(now())
+  ticket    SupportTicket  @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+}
+
+model Dispute {
+  id          String        @id @default(cuid())
+  bookingId   String
+  openedById  String
+  reason      String
+  description String
+  evidence    String?
+  status      DisputeStatus @default(OPEN)
+  adminNotes  String?
+  resolution  String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  booking     Booking       @relation(fields: [bookingId], references: [id])
+  openedBy    User          @relation("DisputeOpener", fields: [openedById], references: [id])
+}
+
+model PlatformSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  adminId    String?
+  action     String
+  entityType String
+  entityId   String
+  metadata   String?
+  createdAt  DateTime @default(now())
+  admin      User?    @relation(fields: [adminId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
